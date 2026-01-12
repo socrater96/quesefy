@@ -29,7 +29,7 @@ public class EventController {
     public ResponseEntity<EventDto> createEvent(@Valid @RequestBody CreateEventRequestDto createEventRequestDto) {
         CreateEventRequest createEventRequest = eventMapper.fromDto(createEventRequestDto);
         Event event = eventService.createEvent(createEventRequest);
-        EventDto creetedEventDto = eventMapper.toDto(event);
-        return new ResponseEntity<>(creetedEventDto, HttpStatus.CREATED);
+        EventDto createdEventDto = eventMapper.toDto(event);
+        return new ResponseEntity<>(createdEventDto, HttpStatus.CREATED);
     }
 }
