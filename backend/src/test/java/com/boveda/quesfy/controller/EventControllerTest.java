@@ -9,7 +9,6 @@ import com.boveda.quesfy.domain.entity.EventType;
 import com.boveda.quesfy.mapper.EventMapper;
 import com.boveda.quesfy.service.EventService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -89,10 +88,68 @@ public class EventControllerTest {
                         .content(requestJson))
                         .andDo(print())
                 .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.title").value("Concierto"))
                 .andExpect(jsonPath("$.type").value("CONCERT"));
 
 
 
     }
+
+    @Test
+    void shouldReturn400WhenTitleIsMissing() throws Exception {
+
+        String invalidJson = """
+        {
+          "description": "Sin título",
+          "type": "CONCERT",
+          "status": "DUE",
+          "date": "2026-01-10"
+        }
+        """;
+
+        mockMvc.perform(post("/api/v1/events")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturn400WhenDateIsInvalid() throws Exception {
+        String invalidJson = """
+        {
+          "title": "Concierto",
+          "description": "Rock en vivo",
+          "type": "CONCERT",
+          "status": "DUE",
+          "date": "invalid-date"
+        }
+        """;
+
+        mockMvc.perform(post("/api/v1/events")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidJson))
+                .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    void shouldReturn400WhenDateIsPast() throws Exception {
+        String pastDate = LocalDate.now().minusDays(1).toString();
+        String invalidJson = """
+        {
+          "title": "Concierto",
+          "description": "Rock en vivo",
+          "type": "CONCERT",
+          "status": "DUE",
+          "date": "%s"
+        }
+        """.formatted(pastDate);
+
+        mockMvc.perform(post("/api/v1/events")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidJson))
+                .andExpect(status().isBadRequest());
+    }
+
 }
