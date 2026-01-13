@@ -4,6 +4,7 @@ import com.boveda.quesfy.domain.CreateEventRequest;
 import com.boveda.quesfy.domain.entity.Event;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface EventService {
 
@@ -11,4 +12,5 @@ public interface EventService {
 
     List<Event> listEvents();
 
+    Event getEventById(UUID id);
 }
