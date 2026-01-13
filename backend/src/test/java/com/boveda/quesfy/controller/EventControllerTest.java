@@ -16,6 +16,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -42,7 +43,7 @@ public class EventControllerTest {
     @Test
     public void shouldCreateEventAndReturn201() throws Exception {
 
-        LocalDate validDate = LocalDate.now().plusDays(1);
+        LocalDateTime validDate = LocalDateTime.now().plusDays(1);
         String validDateStr = validDate.toString();
 
         String requestJson = """
@@ -103,7 +104,7 @@ public class EventControllerTest {
     @Test
     void shouldReturn400WhenTitleIsMissing() throws Exception {
 
-        String validDateStr = LocalDate.now().plusDays(1).toString();
+        String validDateStr = LocalDateTime.now().plusDays(1).toString();
 
         String invalidJson = """
         {
