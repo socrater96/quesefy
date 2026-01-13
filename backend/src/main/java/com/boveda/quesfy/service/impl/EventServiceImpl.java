@@ -5,7 +5,10 @@ import com.boveda.quesfy.domain.entity.Event;
 import com.boveda.quesfy.domain.entity.EventStatus;
 import com.boveda.quesfy.repository.EventRepository;
 import com.boveda.quesfy.service.EventService;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class EventServiceImpl implements EventService {
@@ -15,6 +18,7 @@ public class EventServiceImpl implements EventService {
     public EventServiceImpl(EventRepository eventRepository) {
         this.eventRepository = eventRepository;
     }
+
     @Override
     public Event createEvent(CreateEventRequest request) {
         Event event = new Event(
@@ -26,5 +30,10 @@ public class EventServiceImpl implements EventService {
                 EventStatus.DUE
         );
         return eventRepository.save(event);
+    }
+
+    @Override
+    public List<Event> listEvents() {
+        return eventRepository.findAll(Sort.by(Sort.Direction.DESC, "date"));
     }
 }

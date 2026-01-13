@@ -9,10 +9,9 @@ import com.boveda.quesfy.service.EventService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/v1/events")
@@ -31,5 +30,16 @@ public class EventController {
         Event event = eventService.createEvent(createEventRequest);
         EventDto createdEventDto = eventMapper.toDto(event);
         return new ResponseEntity<>(createdEventDto, HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<EventDto>> listEvents() {
+
+        List<Event> events = eventService.listEvents();
+        List<EventDto> eventDtoList = events.stream()
+                .map(eventMapper::toDto)
+                .toList();
+
+        return ResponseEntity.ok(eventDtoList);
     }
 }

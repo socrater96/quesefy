@@ -17,10 +17,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -157,6 +159,58 @@ public class EventControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidJson))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnListOfEvents() throws Exception {
+        LocalDateTime validDate = LocalDateTime.now().plusDays(1);
+
+        Event event1 = new Event(
+                UUID.randomUUID(),
+                "Concierto",
+                "Rock en vivo",
+                validDate,
+                EventType.CONCERT,
+                EventStatus.DUE
+
+        );
+        Event event2 = new Event(
+                UUID.randomUUID(),
+                "One Battle After Another",
+                "Película de PT Anderson con Leonardo Dicaprio",
+                validDate,
+                EventType.MOVIE,
+                EventStatus.DUE
+        );
+
+        when(eventService.listEvents()).thenReturn(List.of(event1, event2));
+        when(eventMapper.toDto(any(Event.class)))
+                .thenAnswer(invocation -> {
+                    Event e = invocation.getArgument(0);
+                    return new EventDto(
+                            e.getId(),
+                            e.getTitle(),
+                            e.getDescription(),
+                            e.getDate(),
+                            e.getType(),
+                            e.getStatus()
+                    );
+                });
+        mockMvc.perform(get("/api/v1/events"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(event1.getId().toString()))
+                .andExpect(jsonPath("$[1].type").value("MOVIE"));
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoEventsExist() throws Exception {
+
+        when(eventService.listEvents()).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/v1/events"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
     }
 
 }
