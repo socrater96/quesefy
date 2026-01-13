@@ -1,15 +1,13 @@
 package com.boveda.quesfy.domain;
 
-import com.boveda.quesfy.domain.entity.EventStatus;
 import com.boveda.quesfy.domain.entity.EventType;
 
-import java.time.LocalDate;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public record CreateEventRequest(
         String title,
         String description,
-        LocalDate date,
+        LocalDateTime date,
         EventType type
 ) {
 

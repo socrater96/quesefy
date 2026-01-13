@@ -2,12 +2,12 @@ package com.boveda.quesfy.domain.dto;
 
 import com.boveda.quesfy.domain.entity.EventType;
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record CreateEventRequestDto(
         @NotBlank(message = ERROR_MESSAGE_TITLE_LENGTH)
@@ -16,9 +16,9 @@ public record CreateEventRequestDto(
         @Length(max = 1000, message = ERROR_MESSAGE_DESCRIPTION_LENGTH)
         @Nullable
         String description,
-        @FutureOrPresent(message = ERROR_MESSAGE_DUE_DATE_FUTURE)
+        @Future(message = ERROR_MESSAGE_DUE_DATE_FUTURE)
         @Nullable
-        LocalDate date,
+        LocalDateTime date,
         @NotNull(message = ERROR_MESSAGE_PRIORITY)
         EventType type
 ) {
