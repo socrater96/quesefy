@@ -41,20 +41,24 @@ public class EventControllerTest {
 
     @Test
     public void shouldCreateEventAndReturn201() throws Exception {
+
+        LocalDate validDate = LocalDate.now().plusDays(1);
+        String validDateStr = validDate.toString();
+
         String requestJson = """
         {
           "title": "Concierto",
           "description": "Rock en vivo",
           "type": "CONCERT",
           "status": "DUE",
-          "date": "2026-01-18"
+          "date": "%s"
         }
-        """;
+        """.formatted(validDateStr);
 
         CreateEventRequest domainRequest = new CreateEventRequest(
                 "Concierto",
                 "Rock en vivo",
-                LocalDate.of(2026, 1, 18),
+                validDate,
                 EventType.CONCERT
 
         );
@@ -63,7 +67,7 @@ public class EventControllerTest {
                 UUID.randomUUID(),
                 "Concierto",
                 "Rock en vivo",
-                LocalDate.of(2026, 1, 18),
+                validDate,
                 EventType.CONCERT,
                 EventStatus.DUE
 
@@ -99,14 +103,16 @@ public class EventControllerTest {
     @Test
     void shouldReturn400WhenTitleIsMissing() throws Exception {
 
+        String validDateStr = LocalDate.now().plusDays(1).toString();
+
         String invalidJson = """
         {
           "description": "Sin título",
           "type": "CONCERT",
           "status": "DUE",
-          "date": "2026-01-10"
+          "date": "%s"
         }
-        """;
+        """.formatted(validDateStr);
 
         mockMvc.perform(post("/api/v1/events")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -135,7 +141,7 @@ public class EventControllerTest {
 
     @Test
     void shouldReturn400WhenDateIsPast() throws Exception {
-        String pastDate = LocalDate.now().minusDays(1).toString();
+        String pastDateStr = LocalDate.now().minusDays(1).toString();
         String invalidJson = """
         {
           "title": "Concierto",
@@ -144,7 +150,7 @@ public class EventControllerTest {
           "status": "DUE",
           "date": "%s"
         }
-        """.formatted(pastDate);
+        """.formatted(pastDateStr);
 
         mockMvc.perform(post("/api/v1/events")
                         .contentType(MediaType.APPLICATION_JSON)
