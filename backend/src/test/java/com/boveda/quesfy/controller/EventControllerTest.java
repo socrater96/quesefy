@@ -6,6 +6,7 @@ import com.boveda.quesfy.domain.dto.EventDto;
 import com.boveda.quesfy.domain.entity.Event;
 import com.boveda.quesfy.domain.entity.EventStatus;
 import com.boveda.quesfy.domain.entity.EventType;
+import com.boveda.quesfy.domain.exception.ResourceNotFoundException;
 import com.boveda.quesfy.mapper.EventMapper;
 import com.boveda.quesfy.service.EventService;
 import org.junit.jupiter.api.Test;
@@ -211,6 +212,50 @@ public class EventControllerTest {
         mockMvc.perform(get("/api/v1/events"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
+    }
+
+    @Test
+    void shouldReturn200WhenEventsExist() throws Exception {
+        LocalDateTime validDate = LocalDateTime.now().plusDays(1);
+
+        Event event = new Event(
+                UUID.randomUUID(),
+                "Concierto",
+                "Rock en vivo",
+                validDate,
+                EventType.CONCERT,
+                EventStatus.DUE
+
+        );
+
+        EventDto eventDto = new EventDto(
+                event.getId(),
+                event.getTitle(),
+                event.getDescription(),
+                event.getDate(),
+                event.getType(),
+                event.getStatus()
+        );
+
+        when(eventService.getEventById(event.getId())).thenReturn(event);
+        when(eventMapper.toDto(event)).thenReturn(eventDto);
+
+        mockMvc.perform(get("/api/v1/events/" + event.getId().toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(event.getId().toString()));
+    }
+
+    @Test
+    void shouldReturn404WhenEventDoesNotExist() throws Exception {
+        UUID nonExistingId = UUID.randomUUID();
+
+        when(eventService.getEventById(nonExistingId))
+                .thenThrow(new ResourceNotFoundException(
+                        "Event with id " + nonExistingId + " not found"
+                ));
+
+        mockMvc.perform(get("/api/v1/events/" + nonExistingId))
+                .andExpect(status().isNotFound());
     }
 
 }
