@@ -2,7 +2,10 @@ package com.boveda.quesfy.controller;
 
 
 import com.boveda.quesfy.domain.CreateEventRequest;
+import com.boveda.quesfy.domain.UpdateEventRequest;
+import com.boveda.quesfy.domain.dto.CreateEventRequestDto;
 import com.boveda.quesfy.domain.dto.EventDto;
+import com.boveda.quesfy.domain.dto.UpdateEventRequestDto;
 import com.boveda.quesfy.domain.entity.Event;
 import com.boveda.quesfy.domain.entity.EventStatus;
 import com.boveda.quesfy.domain.entity.EventType;
@@ -25,6 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -87,9 +91,9 @@ public class EventControllerTest {
 
         );
 
-        when(eventMapper.fromDto(any())).thenReturn(domainRequest);
-        when(eventService.createEvent(any())).thenReturn(event);
-        when(eventMapper.toDto(any())).thenReturn(responseDto);
+        when(eventMapper.fromDto(any(CreateEventRequestDto.class))).thenReturn(domainRequest);
+        when(eventService.createEvent(domainRequest)).thenReturn(event);
+        when(eventMapper.toDto(event)).thenReturn(responseDto);
 
         mockMvc.perform(post("/api/v1/events")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -99,8 +103,6 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.title").value("Concierto"))
                 .andExpect(jsonPath("$.type").value("CONCERT"));
-
-
 
     }
 
@@ -253,6 +255,96 @@ public class EventControllerTest {
                 .thenThrow(new EventNotFoundException(nonExistingId));
 
         mockMvc.perform(get("/api/v1/events/{id}", nonExistingId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldUpdateEventAndReturn200() throws Exception {
+        LocalDateTime validDate = LocalDateTime.now().plusDays(1);
+        String validDateStr = validDate.toString();
+
+        String requestJson = """
+        {
+          "title": "Concierto",
+          "description": "Rock en vivo",
+          "type": "CONCERT",
+          "status": "DUE",
+          "date": "%s"
+        }
+        """.formatted(validDateStr);
+
+        UpdateEventRequest domainRequest = new UpdateEventRequest(
+                "Concierto",
+                "Rock en vivo",
+                validDate,
+                EventType.CONCERT,
+                EventStatus.CANCELED
+
+        );
+
+        Event event = new Event(
+                UUID.randomUUID(),
+                "Concierto",
+                "Rock en vivo",
+                validDate,
+                EventType.CONCERT,
+                EventStatus.CANCELED
+
+        );
+
+        EventDto responseDto = new EventDto(
+                event.getId(),
+                event.getTitle(),
+                event.getDescription(),
+                event.getDate(),
+                event.getType(),
+                event.getStatus()
+
+        );
+
+        when(eventMapper.fromDto(any(UpdateEventRequestDto.class))).thenReturn(domainRequest);
+        when(eventService.updateEvent(event.getId(), domainRequest)).thenReturn(event);
+        when(eventMapper.toDto(event)).thenReturn(responseDto);
+
+        mockMvc.perform(put("/api/v1/events/" + event.getId().toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(event.getId().toString()))
+                .andExpect(jsonPath("$.status").value(event.getStatus().toString()));
+
+    }
+
+    @Test
+    void shouldUpdateEventAndReturn404WhenEventDoesNotExist() throws Exception {
+        UUID nonExistingId = UUID.randomUUID();
+        LocalDateTime validDate = LocalDateTime.now().plusDays(1);
+
+        String requestJson = """
+        {
+          "title": "Concierto",
+          "description": "Rock en vivo",
+          "type": "CONCERT",
+          "status": "DUE",
+          "date": "%s"
+        }
+        """.formatted(validDate.toString());
+
+        UpdateEventRequest domainRequest = new UpdateEventRequest(
+                "Concierto",
+                "Rock en vivo",
+                validDate,
+                EventType.CONCERT,
+                EventStatus.DUE
+        );
+        when(eventMapper.fromDto(any(UpdateEventRequestDto.class)))
+                .thenReturn(domainRequest);
+        when(eventService.updateEvent(nonExistingId, domainRequest))
+                .thenThrow(new EventNotFoundException(nonExistingId));
+
+        mockMvc.perform(put("/api/v1/events/" + nonExistingId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestJson))
                 .andExpect(status().isNotFound());
     }
 

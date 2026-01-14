@@ -1,6 +1,7 @@
 package com.boveda.quesfy.service.impl;
 
 import com.boveda.quesfy.domain.CreateEventRequest;
+import com.boveda.quesfy.domain.UpdateEventRequest;
 import com.boveda.quesfy.domain.entity.Event;
 import com.boveda.quesfy.domain.entity.EventStatus;
 import com.boveda.quesfy.domain.exception.EventNotFoundException;
@@ -44,4 +45,19 @@ public class EventServiceImpl implements EventService {
         return eventRepository.findById(id)
                 .orElseThrow(() -> new EventNotFoundException(id));
     }
+
+    @Override
+    public Event updateEvent(UUID eventId, UpdateEventRequest request) {
+        Event event = eventRepository.findById(eventId)
+                        .orElseThrow(() -> new EventNotFoundException(eventId));
+
+        event.setTitle(request.title());
+        event.setDescription(request.description());
+        event.setDate(request.date());
+        event.setType(request.type());
+        event.setStatus(request.status());
+
+        return eventRepository.save(event);
+    }
+
 }
