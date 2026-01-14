@@ -1,8 +1,10 @@
 package com.boveda.quesfy.controller;
 
 import com.boveda.quesfy.domain.CreateEventRequest;
+import com.boveda.quesfy.domain.UpdateEventRequest;
 import com.boveda.quesfy.domain.dto.CreateEventRequestDto;
 import com.boveda.quesfy.domain.dto.EventDto;
+import com.boveda.quesfy.domain.dto.UpdateEventRequestDto;
 import com.boveda.quesfy.domain.entity.Event;
 import com.boveda.quesfy.mapper.EventMapper;
 import com.boveda.quesfy.service.EventService;
@@ -52,4 +54,17 @@ public class EventController {
 
         return ResponseEntity.ok(eventDto);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<EventDto> updateEvent(
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateEventRequestDto updateEventRequestDto
+    ) {
+        UpdateEventRequest updateEventRequest = eventMapper.fromDto(updateEventRequestDto);
+        Event event = eventService.updateEvent(id, updateEventRequest);
+        EventDto updatedEventDto = eventMapper.toDto(event);
+
+        return ResponseEntity.ok(updatedEventDto);
+    }
+
 }

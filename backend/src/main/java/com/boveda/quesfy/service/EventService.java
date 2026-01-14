@@ -1,6 +1,7 @@
 package com.boveda.quesfy.service;
 
 import com.boveda.quesfy.domain.CreateEventRequest;
+import com.boveda.quesfy.domain.UpdateEventRequest;
 import com.boveda.quesfy.domain.entity.Event;
 
 import java.util.List;
@@ -13,4 +14,7 @@ public interface EventService {
     List<Event> listEvents();
 
     Event getEventById(UUID id);
+
+    Event updateEvent(UUID id, UpdateEventRequest request);
+
 }
