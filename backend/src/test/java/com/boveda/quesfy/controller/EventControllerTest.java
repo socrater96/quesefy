@@ -6,7 +6,7 @@ import com.boveda.quesfy.domain.dto.EventDto;
 import com.boveda.quesfy.domain.entity.Event;
 import com.boveda.quesfy.domain.entity.EventStatus;
 import com.boveda.quesfy.domain.entity.EventType;
-import com.boveda.quesfy.domain.exception.ResourceNotFoundException;
+import com.boveda.quesfy.domain.exception.EventNotFoundException;
 import com.boveda.quesfy.mapper.EventMapper;
 import com.boveda.quesfy.service.EventService;
 import org.junit.jupiter.api.Test;
@@ -250,12 +250,11 @@ public class EventControllerTest {
         UUID nonExistingId = UUID.randomUUID();
 
         when(eventService.getEventById(nonExistingId))
-                .thenThrow(new ResourceNotFoundException(
-                        "Event with id " + nonExistingId + " not found"
-                ));
+                .thenThrow(new EventNotFoundException(nonExistingId));
 
-        mockMvc.perform(get("/api/v1/events/" + nonExistingId))
+        mockMvc.perform(get("/api/v1/events/{id}", nonExistingId))
                 .andExpect(status().isNotFound());
     }
+
 
 }

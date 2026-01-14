@@ -1,7 +1,7 @@
 package com.boveda.quesfy.controller;
 
 import com.boveda.quesfy.domain.dto.ErrorDto;
-import com.boveda.quesfy.domain.exception.ResourceNotFoundException;
+import com.boveda.quesfy.domain.exception.EventNotFoundException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +25,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public  ResponseEntity<ErrorDto>  handleResourceNotFoundException(ResourceNotFoundException ex) {
+    @ExceptionHandler(EventNotFoundException.class)
+    public  ResponseEntity<ErrorDto>  handleEventNotFound(EventNotFoundException ex) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(new ErrorDto(ex.getMessage()));
