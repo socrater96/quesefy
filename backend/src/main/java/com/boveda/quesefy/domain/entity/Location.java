@@ -20,4 +20,31 @@ public class Location {
     private Double latitude;
     private Double longitude;
 
+    public String getAddress() {
+        return address;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public String getZipcode() {
+        return zipcode;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
 }
