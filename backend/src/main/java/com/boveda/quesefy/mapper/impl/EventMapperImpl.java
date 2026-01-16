@@ -7,10 +7,17 @@ import com.boveda.quesefy.domain.dto.EventDto;
 import com.boveda.quesefy.domain.dto.UpdateEventRequestDto;
 import com.boveda.quesefy.domain.entity.Event;
 import com.boveda.quesefy.mapper.EventMapper;
+import com.boveda.quesefy.mapper.VenueMapper;
 import org.springframework.stereotype.Component;
 
 @Component
 public class EventMapperImpl implements EventMapper {
+    private final VenueMapper venueMapper;
+
+    public EventMapperImpl(VenueMapper venueMapper) {
+        this.venueMapper = venueMapper;
+    }
+
     @Override
     public CreateEventRequest fromDto(CreateEventRequestDto requestDto) {
         return new CreateEventRequest(
@@ -40,7 +47,10 @@ public class EventMapperImpl implements EventMapper {
                 event.getDescription(),
                 event.getDate(),
                 event.getType(),
-                event.getStatus()
+                event.getStatus(),
+                event.getVenue() != null
+                        ? venueMapper.toDto(event.getVenue())
+                        : null
         );
     }
 }

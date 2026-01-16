@@ -22,4 +22,22 @@ public class Venue {
 
     @Embedded
     private Location location;
+
+    public UUID getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public VenueType getVenueType() {
+        return venueType;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+
 }

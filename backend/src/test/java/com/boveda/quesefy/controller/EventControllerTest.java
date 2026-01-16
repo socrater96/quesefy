@@ -87,7 +87,8 @@ public class EventControllerTest {
                 event.getDescription(),
                 event.getDate(),
                 event.getType(),
-                event.getStatus()
+                event.getStatus(),
+                null
 
         );
 
@@ -196,7 +197,8 @@ public class EventControllerTest {
                             e.getDescription(),
                             e.getDate(),
                             e.getType(),
-                            e.getStatus()
+                            e.getStatus(),
+                            null
                     );
                 });
         mockMvc.perform(get("/api/v1/events"))
@@ -236,7 +238,8 @@ public class EventControllerTest {
                 event.getDescription(),
                 event.getDate(),
                 event.getType(),
-                event.getStatus()
+                event.getStatus(),
+                null
         );
 
         when(eventService.getEventById(event.getId())).thenReturn(event);
@@ -298,7 +301,8 @@ public class EventControllerTest {
                 event.getDescription(),
                 event.getDate(),
                 event.getType(),
-                event.getStatus()
+                event.getStatus(),
+                null
 
         );
 

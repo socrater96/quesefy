@@ -12,7 +12,8 @@ public record EventDto(
         String description,
         LocalDateTime date,
         EventType type,
-        EventStatus status
+        EventStatus status,
+        VenueDto venue
 ) {
 
 

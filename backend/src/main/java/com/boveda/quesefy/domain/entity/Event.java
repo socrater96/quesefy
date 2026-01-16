@@ -96,6 +96,8 @@ public class Event {
         this.status = status;
     }
 
+    public Venue getVenue() {return venue;}
+
     public void assignVenue(Venue venue) {
         this.venue = venue;
     }
