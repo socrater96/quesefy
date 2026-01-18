@@ -32,6 +32,10 @@ public class Event {
     @Column(name = "status", nullable = false)
     private EventStatus status;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "venue_id")
+    private Venue venue;
+
     public Event() {
     }
 
@@ -92,6 +96,15 @@ public class Event {
         this.status = status;
     }
 
+    public Venue getVenue() {return venue;}
+
+    public void assignVenue(Venue venue) {
+        this.venue = venue;
+    }
+
+    public void removeVenue() {
+        this.venue = null;
+    }
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
