@@ -6,12 +6,13 @@ import com.boveda.quesefy.domain.UpdateEventRequest;
 import com.boveda.quesefy.domain.dto.CreateEventRequestDto;
 import com.boveda.quesefy.domain.dto.EventDto;
 import com.boveda.quesefy.domain.dto.UpdateEventRequestDto;
-import com.boveda.quesefy.domain.entity.Event;
-import com.boveda.quesefy.domain.entity.EventStatus;
-import com.boveda.quesefy.domain.entity.EventType;
+import com.boveda.quesefy.domain.dto.VenueDto;
+import com.boveda.quesefy.domain.entity.*;
 import com.boveda.quesefy.domain.exception.EventNotFoundException;
 import com.boveda.quesefy.mapper.EventMapper;
+import com.boveda.quesefy.mapper.VenueMapper;
 import com.boveda.quesefy.service.EventService;
+import com.boveda.quesefy.utils.TestDataFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -45,6 +46,9 @@ public class EventControllerTest {
 
     @MockitoBean
     private EventMapper eventMapper;
+
+    @MockitoBean
+    private VenueMapper venueMapper;
 
 
     @Test
@@ -87,7 +91,8 @@ public class EventControllerTest {
                 event.getDescription(),
                 event.getDate(),
                 event.getType(),
-                event.getStatus()
+                event.getStatus(),
+                null
 
         );
 
@@ -196,7 +201,8 @@ public class EventControllerTest {
                             e.getDescription(),
                             e.getDate(),
                             e.getType(),
-                            e.getStatus()
+                            e.getStatus(),
+                            null
                     );
                 });
         mockMvc.perform(get("/api/v1/events"))
@@ -236,7 +242,8 @@ public class EventControllerTest {
                 event.getDescription(),
                 event.getDate(),
                 event.getType(),
-                event.getStatus()
+                event.getStatus(),
+                null
         );
 
         when(eventService.getEventById(event.getId())).thenReturn(event);
@@ -298,7 +305,8 @@ public class EventControllerTest {
                 event.getDescription(),
                 event.getDate(),
                 event.getType(),
-                event.getStatus()
+                event.getStatus(),
+                null
 
         );
 
@@ -346,6 +354,75 @@ public class EventControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestJson))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturnListOfEventsWithAndWithoutVenue() throws Exception {
+        LocalDateTime validDate = LocalDateTime.now().plusDays(1);
+
+        Venue venue = new Venue(
+                UUID.randomUUID(),
+                "Folks",
+                VenueType.NIGHT_CLUB,
+                TestDataFactory.createLocation()
+        );
+
+        Event event1 = new Event(
+                UUID.randomUUID(),
+                "Concierto",
+                "Rock",
+                LocalDateTime.now().plusDays(1),
+                EventType.CONCERT,
+                EventStatus.DUE
+        );
+
+        event1.assignVenue(venue);
+
+        VenueDto venueDto = new VenueDto(
+                venue.getId(),
+                venue.getName(),
+                venue.getVenueType(),
+                TestDataFactory.createLocationDto()
+        );
+
+        Event event2 = new Event(
+                UUID.randomUUID(),
+                "One Battle After Another",
+                "Película de PT Anderson con Leonardo Dicaprio",
+                validDate,
+                EventType.MOVIE,
+                EventStatus.DUE
+        );
+
+        when(venueMapper.toDto(any(Venue.class))).thenReturn(venueDto);
+        when(eventService.listEvents()).thenReturn(List.of(event1, event2));
+        when(eventMapper.toDto(any(Event.class)))
+                .thenAnswer(invocation -> {
+            Event e = invocation.getArgument(0);
+            return new EventDto(
+                    e.getId(),
+                    e.getTitle(),
+                    e.getDescription(),
+                    e.getDate(),
+                    e.getType(),
+                    e.getStatus(),
+                    e.getVenue() != null ? venueDto : null
+            );
+        });
+
+        mockMvc.perform(get("/api/v1/events"))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(event1.getId().toString()))
+                .andExpect(jsonPath("$[1].id").value(event2.getId().toString()))
+                .andExpect(jsonPath("$[0].venue").exists())
+                .andExpect(jsonPath("$[0].venue.name").value("Folks"))
+                .andExpect(jsonPath("$[0].venue.venueType").value("NIGHT_CLUB"))
+                .andExpect(jsonPath("$[0].venue.location.city").value("A Coruña"))
+                .andExpect(jsonPath("$[0].venue.location.latitude").value(43.371909))
+                .andExpect(jsonPath("$[0].venue.location.longitude").value(-8.400471))
+                .andExpect(jsonPath("$[1].venue").isEmpty());
     }
 
 
