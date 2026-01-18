@@ -5,7 +5,7 @@ public enum VenueType {
     THEATER,
     MOVIE_THEATER,
     SPORTS_CENTRE,
-    NIGH_CLUB,
+    NIGHT_CLUB,
     MUSIC_VENUE,
     PUBLIC_SQUARE,
 }

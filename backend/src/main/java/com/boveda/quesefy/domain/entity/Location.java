@@ -20,6 +20,16 @@ public class Location {
     private Double latitude;
     private Double longitude;
 
+    public Location(String address, String city, String province, String zipcode, String country, Double latitude, Double longitude) {
+        this.address = address;
+        this.city = city;
+        this.province = province;
+        this.zipcode = zipcode;
+        this.country = country;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
     public String getAddress() {
         return address;
     }
