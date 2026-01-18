@@ -39,5 +39,10 @@ public class Venue {
         return location;
     }
 
-
+    public Venue(UUID id, String name, VenueType venueType, Location location) {
+        this.id = id;
+        this.name = name;
+        this.venueType = venueType;
+        this.location = location;
+    }
 }
