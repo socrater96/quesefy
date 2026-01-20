@@ -19,7 +19,7 @@ public record CreateEventRequestDto(
         @Future(message = ERROR_MESSAGE_DUE_DATE_FUTURE)
         @Nullable
         LocalDateTime date,
-        @NotNull(message = ERROR_MESSAGE_PRIORITY)
+        @NotNull(message = ERROR_MESSAGE_TYPE)
         EventType type
 ) {
     private static final String ERROR_MESSAGE_TITLE_LENGTH =
@@ -28,7 +28,7 @@ public record CreateEventRequestDto(
             "Description must be less than 1000 characters";
     private static final String ERROR_MESSAGE_DUE_DATE_FUTURE =
             "Event date must be in the future";
-    private static final String ERROR_MESSAGE_PRIORITY =
+    private static final String ERROR_MESSAGE_TYPE=
             "Event priority must be provided";
 
 }
