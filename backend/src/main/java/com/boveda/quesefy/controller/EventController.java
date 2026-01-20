@@ -49,6 +49,7 @@ public class EventController {
     )
     @GetMapping
     public ResponseEntity<List<EventDto>> listEvents() {
+
         List<Event> events = eventService.listEvents();
         List<EventDto> eventDtoList = events.stream()
                 .map(eventMapper::toDto)
@@ -71,7 +72,7 @@ public class EventController {
 
     @Operation(
             summary = "Update event by",
-            description = "Updates and existing event when ID is provided"
+            description = "Updates an existing event when ID is provided"
     )
     @PutMapping("/{id}")
     public ResponseEntity<EventDto> updateEvent(
