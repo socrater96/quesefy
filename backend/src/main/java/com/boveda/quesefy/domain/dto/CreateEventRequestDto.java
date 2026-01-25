@@ -1,10 +1,7 @@
 package com.boveda.quesefy.domain.dto;
 
 import com.boveda.quesefy.domain.entity.EventType;
-import com.boveda.quesefy.domain.entity.Venue;
-import com.boveda.quesefy.domain.entity.VenueType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

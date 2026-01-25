@@ -3,7 +3,6 @@ package com.boveda.quesefy.service.impl;
 import com.boveda.quesefy.domain.CreateEventRequest;
 import com.boveda.quesefy.domain.UpdateEventRequest;
 import com.boveda.quesefy.domain.entity.Event;
-import com.boveda.quesefy.domain.entity.EventStatus;
 import com.boveda.quesefy.domain.exception.EventNotFoundException;
 import com.boveda.quesefy.repository.EventRepository;
 import com.boveda.quesefy.service.EventService;
@@ -24,14 +23,14 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Event createEvent(CreateEventRequest request) {
-        Event event = new Event(
-                null,
-                request.title(),
-                request.description(),
-                request.date(),
-                request.type(),
-                EventStatus.DUE
-        );
+        Event event = Event.builder()
+                .id(UUID.randomUUID())
+                .title(request.title())
+                .description(request.description())
+                .date(request.date())
+                .type(request.type())
+                .build();
+
         return eventRepository.save(event);
     }
 

@@ -75,15 +75,13 @@ public class EventControllerTest {
 
         );
 
-        Event event = new Event(
-                UUID.randomUUID(),
-                "Concierto",
-                "Rock en vivo",
-                validDate,
-                EventType.CONCERT,
-                EventStatus.DUE
-
-        );
+        Event event = Event.builder()
+                .id(UUID.randomUUID())
+                .title("Concierto")
+                .description("Rock en vivo")
+                .date(validDate)
+                .type(EventType.CONCERT)
+                .build();
 
         EventDto responseDto = new EventDto(
                 event.getId(),
@@ -173,23 +171,21 @@ public class EventControllerTest {
     void shouldReturnListOfEvents() throws Exception {
         LocalDateTime validDate = LocalDateTime.now().plusDays(1);
 
-        Event event1 = new Event(
-                UUID.randomUUID(),
-                "Concierto",
-                "Rock en vivo",
-                validDate,
-                EventType.CONCERT,
-                EventStatus.DUE
+        Event event1 = Event.builder()
+                .id(UUID.randomUUID())
+                .title("Concierto")
+                .description("Rock en vivo")
+                .date(validDate)
+                .type(EventType.CONCERT)
+                .build();
 
-        );
-        Event event2 = new Event(
-                UUID.randomUUID(),
-                "One Battle After Another",
-                "Película de PT Anderson con Leonardo Dicaprio",
-                validDate,
-                EventType.MOVIE,
-                EventStatus.DUE
-        );
+        Event event2 = Event.builder()
+                .id(UUID.randomUUID())
+                .title("One Battle After Another")
+                .description("Película de PT Anderson con Leonardo Dicaprio")
+                .date(validDate)
+                .type(EventType.MOVIE)
+                .build();
 
         when(eventService.listEvents()).thenReturn(List.of(event1, event2));
         when(eventMapper.toDto(any(Event.class)))
@@ -226,15 +222,13 @@ public class EventControllerTest {
     void shouldReturn200WhenEventsExist() throws Exception {
         LocalDateTime validDate = LocalDateTime.now().plusDays(1);
 
-        Event event = new Event(
-                UUID.randomUUID(),
-                "Concierto",
-                "Rock en vivo",
-                validDate,
-                EventType.CONCERT,
-                EventStatus.DUE
-
-        );
+        Event event = Event.builder()
+                .id(UUID.randomUUID())
+                .title("Concierto")
+                .description("Rock en vivo")
+                .date(validDate)
+                .type(EventType.CONCERT)
+                .build();
 
         EventDto eventDto = new EventDto(
                 event.getId(),
@@ -289,15 +283,13 @@ public class EventControllerTest {
 
         );
 
-        Event event = new Event(
-                UUID.randomUUID(),
-                "Concierto",
-                "Rock en vivo",
-                validDate,
-                EventType.CONCERT,
-                EventStatus.CANCELED
-
-        );
+        Event event = Event.builder()
+                .id(UUID.randomUUID())
+                .title("Concierto")
+                .description("Rock en vivo")
+                .date(validDate)
+                .type(EventType.CONCERT)
+                .build();
 
         EventDto responseDto = new EventDto(
                 event.getId(),
@@ -360,6 +352,7 @@ public class EventControllerTest {
     void shouldReturnListOfEventsWithAndWithoutVenue() throws Exception {
         LocalDateTime validDate = LocalDateTime.now().plusDays(1);
 
+
         Venue venue = new Venue(
                 UUID.randomUUID(),
                 "Folks",
@@ -367,14 +360,13 @@ public class EventControllerTest {
                 TestDataFactory.createLocation()
         );
 
-        Event event1 = new Event(
-                UUID.randomUUID(),
-                "Concierto",
-                "Rock",
-                LocalDateTime.now().plusDays(1),
-                EventType.CONCERT,
-                EventStatus.DUE
-        );
+        Event event1 = Event.builder()
+                .id(UUID.randomUUID())
+                .title("Concierto")
+                .description("Rock en vivo")
+                .date(validDate)
+                .type(EventType.CONCERT)
+                .build();
 
         event1.assignVenue(venue);
 
@@ -385,14 +377,13 @@ public class EventControllerTest {
                 TestDataFactory.createLocationDto()
         );
 
-        Event event2 = new Event(
-                UUID.randomUUID(),
-                "One Battle After Another",
-                "Película de PT Anderson con Leonardo Dicaprio",
-                validDate,
-                EventType.MOVIE,
-                EventStatus.DUE
-        );
+        Event event2 = Event.builder()
+                .id(UUID.randomUUID())
+                .title("One Battle After Another")
+                .description("Película de PT Anderson con Leonardo Dicaprio")
+                .date(validDate)
+                .type(EventType.MOVIE)
+                .build();
 
         when(venueMapper.toDto(any(Venue.class))).thenReturn(venueDto);
         when(eventService.listEvents()).thenReturn(List.of(event1, event2));
