@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -40,7 +39,7 @@ public record CreateEventRequestDto(
                 description = "Type",
                 example = "CONCERT"
         )
-        @NotNull(message = ERROR_MESSAGE_TYPE)
+        @NotNull(message = ERROR_MESSAGE_PRIORITY)
         EventType type,
 
         @Schema(
@@ -57,7 +56,7 @@ public record CreateEventRequestDto(
             "Description must be less than 1000 characters";
     private static final String ERROR_MESSAGE_DUE_DATE_FUTURE =
             "Event date must be in the future";
-    private static final String ERROR_MESSAGE_TYPE=
+    private static final String ERROR_MESSAGE_PRIORITY=
             "Event priority must be provided";
 
 }
