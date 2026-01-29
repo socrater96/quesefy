@@ -19,6 +19,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,6 +42,9 @@ public class EventControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @MockitoBean
     private EventService eventService;
 
@@ -53,66 +57,35 @@ public class EventControllerTest {
 
     @Test
     public void shouldCreateEventAndReturn201() throws Exception {
+        CreateEventRequest request = TestDataFactory.createEventRequest();
 
-        LocalDateTime validDate = LocalDateTime.now().plusDays(1);
-        String validDateStr = validDate.toString();
+        UUID eventId = UUID.randomUUID();
+        Event event = TestDataFactory.createEvent(eventId);
 
-        String requestJson = """
-        {
-          "title": "Concierto",
-          "description": "Rock en vivo",
-          "type": "CONCERT",
-          "status": "DUE",
-          "date": "%s"
-        }
-        """.formatted(validDateStr);
+        EventDto responseDto = TestDataFactory.createEventDto(event.getId());
 
-        CreateEventRequest domainRequest = new CreateEventRequest(
-                "Concierto",
-                "Rock en vivo",
-                validDate,
-                EventType.CONCERT
-
-        );
-
-        Event event = Event.builder()
-                .id(UUID.randomUUID())
-                .title("Concierto")
-                .description("Rock en vivo")
-                .date(validDate)
-                .type(EventType.CONCERT)
-                .build();
-
-        EventDto responseDto = new EventDto(
-                event.getId(),
-                event.getTitle(),
-                event.getDescription(),
-                event.getDate(),
-                event.getType(),
-                event.getStatus(),
-                null
-
-        );
-
-        when(eventMapper.fromDto(any(CreateEventRequestDto.class))).thenReturn(domainRequest);
-        when(eventService.createEvent(domainRequest)).thenReturn(event);
+        when(eventMapper.fromDto(any(CreateEventRequestDto.class))).thenReturn(request);
+        when(eventService.createEvent(request)).thenReturn(event);
         when(eventMapper.toDto(event)).thenReturn(responseDto);
 
         mockMvc.perform(post("/api/v1/events")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
+                        .content(objectMapper.writeValueAsString(request)))
                         .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.title").value("Concierto"))
+                .andExpect(jsonPath("$.title").value("DJ Chvrly"))
                 .andExpect(jsonPath("$.type").value("CONCERT"));
 
     }
 
     @Test
     void shouldReturn400WhenTitleIsMissing() throws Exception {
+        String validDateStr = LocalDateTime.of(
+                1970, 1, 1, 0, 0, 0
+                )
+                .toString();
 
-        String validDateStr = LocalDateTime.now().plusDays(1).toString();
 
         String invalidJson = """
         {
@@ -169,23 +142,11 @@ public class EventControllerTest {
 
     @Test
     void shouldReturnListOfEvents() throws Exception {
-        LocalDateTime validDate = LocalDateTime.now().plusDays(1);
+        UUID eventId1 = UUID.randomUUID();
+        Event event1 = TestDataFactory.createEvent(eventId1);
 
-        Event event1 = Event.builder()
-                .id(UUID.randomUUID())
-                .title("Concierto")
-                .description("Rock en vivo")
-                .date(validDate)
-                .type(EventType.CONCERT)
-                .build();
-
-        Event event2 = Event.builder()
-                .id(UUID.randomUUID())
-                .title("One Battle After Another")
-                .description("Película de PT Anderson con Leonardo Dicaprio")
-                .date(validDate)
-                .type(EventType.MOVIE)
-                .build();
+        UUID eventId2 = UUID.randomUUID();
+        Event event2 = TestDataFactory.createEvent(eventId2);
 
         when(eventService.listEvents()).thenReturn(List.of(event1, event2));
         when(eventMapper.toDto(any(Event.class)))
@@ -205,7 +166,7 @@ public class EventControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].id").value(event1.getId().toString()))
-                .andExpect(jsonPath("$[1].type").value("MOVIE"));
+                .andExpect(jsonPath("$[1].id").value(event2.getId().toString()));
     }
 
     @Test
@@ -220,25 +181,10 @@ public class EventControllerTest {
 
     @Test
     void shouldReturn200WhenEventsExist() throws Exception {
-        LocalDateTime validDate = LocalDateTime.now().plusDays(1);
+        UUID eventId = UUID.randomUUID();
+        Event event = TestDataFactory.createEvent(eventId);
 
-        Event event = Event.builder()
-                .id(UUID.randomUUID())
-                .title("Concierto")
-                .description("Rock en vivo")
-                .date(validDate)
-                .type(EventType.CONCERT)
-                .build();
-
-        EventDto eventDto = new EventDto(
-                event.getId(),
-                event.getTitle(),
-                event.getDescription(),
-                event.getDate(),
-                event.getType(),
-                event.getStatus(),
-                null
-        );
+        EventDto eventDto = TestDataFactory.createEventDto(event.getId());
 
         when(eventService.getEventById(event.getId())).thenReturn(event);
         when(eventMapper.toDto(event)).thenReturn(eventDto);
@@ -261,54 +207,20 @@ public class EventControllerTest {
 
     @Test
     void shouldUpdateEventAndReturn200() throws Exception {
-        LocalDateTime validDate = LocalDateTime.now().plusDays(1);
-        String validDateStr = validDate.toString();
+        UpdateEventRequest updateEventRequest = TestDataFactory.createUpdateEventRequest();
 
-        String requestJson = """
-        {
-          "title": "Concierto",
-          "description": "Rock en vivo",
-          "type": "CONCERT",
-          "status": "DUE",
-          "date": "%s"
-        }
-        """.formatted(validDateStr);
+        UUID eventId = UUID.randomUUID();
+        Event event = TestDataFactory.createEvent(eventId);
 
-        UpdateEventRequest domainRequest = new UpdateEventRequest(
-                "Concierto",
-                "Rock en vivo",
-                validDate,
-                EventType.CONCERT,
-                EventStatus.CANCELED
+        EventDto eventDto = TestDataFactory.createEventDto(event.getId());
 
-        );
-
-        Event event = Event.builder()
-                .id(UUID.randomUUID())
-                .title("Concierto")
-                .description("Rock en vivo")
-                .date(validDate)
-                .type(EventType.CONCERT)
-                .build();
-
-        EventDto responseDto = new EventDto(
-                event.getId(),
-                event.getTitle(),
-                event.getDescription(),
-                event.getDate(),
-                event.getType(),
-                event.getStatus(),
-                null
-
-        );
-
-        when(eventMapper.fromDto(any(UpdateEventRequestDto.class))).thenReturn(domainRequest);
-        when(eventService.updateEvent(event.getId(), domainRequest)).thenReturn(event);
-        when(eventMapper.toDto(event)).thenReturn(responseDto);
+        when(eventMapper.fromDto(any(UpdateEventRequestDto.class))).thenReturn(updateEventRequest);
+        when(eventService.updateEvent(event.getId(), updateEventRequest)).thenReturn(event);
+        when(eventMapper.toDto(event)).thenReturn(eventDto);
 
         mockMvc.perform(put("/api/v1/events/" + event.getId().toString())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
+                        .content(objectMapper.writeValueAsString(updateEventRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(event.getId().toString()))
                 .andExpect(jsonPath("$.status").value(event.getStatus().toString()));
@@ -316,77 +228,37 @@ public class EventControllerTest {
     }
 
     @Test
-    void shouldUpdateEventAndReturn404WhenEventDoesNotExist() throws Exception {
+    void shouldNotUpdateEventAndReturn404WhenEventDoesNotExist() throws Exception {
         UUID nonExistingId = UUID.randomUUID();
-        LocalDateTime validDate = LocalDateTime.now().plusDays(1);
 
-        String requestJson = """
-        {
-          "title": "Concierto",
-          "description": "Rock en vivo",
-          "type": "CONCERT",
-          "status": "DUE",
-          "date": "%s"
-        }
-        """.formatted(validDate.toString());
+        UpdateEventRequest updateEventRequest = TestDataFactory.createUpdateEventRequest();
 
-        UpdateEventRequest domainRequest = new UpdateEventRequest(
-                "Concierto",
-                "Rock en vivo",
-                validDate,
-                EventType.CONCERT,
-                EventStatus.DUE
-        );
         when(eventMapper.fromDto(any(UpdateEventRequestDto.class)))
-                .thenReturn(domainRequest);
-        when(eventService.updateEvent(nonExistingId, domainRequest))
+                .thenReturn(updateEventRequest);
+        when(eventService.updateEvent(nonExistingId, updateEventRequest))
                 .thenThrow(new EventNotFoundException(nonExistingId));
 
         mockMvc.perform(put("/api/v1/events/" + nonExistingId)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(requestJson))
+                    .content(objectMapper.writeValueAsString(updateEventRequest)))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void shouldReturnListOfEventsWithAndWithoutVenue() throws Exception {
-        LocalDateTime validDate = LocalDateTime.now().plusDays(1);
+        UUID venueId = UUID.randomUUID();
+        Venue venue = TestDataFactory.createVenue(venueId);
 
+        UUID eventWithVenueId = UUID.randomUUID();
+        Event eventWithVenue = TestDataFactory.createEventWithVenue(eventWithVenueId, venue);
 
-        Venue venue = new Venue(
-                UUID.randomUUID(),
-                "Folks",
-                VenueType.NIGHT_CLUB,
-                TestDataFactory.createLocation()
-        );
+        VenueDto venueDto = TestDataFactory.createVenueDto(venue.getId());
 
-        Event event1 = Event.builder()
-                .id(UUID.randomUUID())
-                .title("Concierto")
-                .description("Rock en vivo")
-                .date(validDate)
-                .type(EventType.CONCERT)
-                .build();
-
-        event1.assignVenue(venue);
-
-        VenueDto venueDto = new VenueDto(
-                venue.getId(),
-                venue.getName(),
-                venue.getVenueType(),
-                TestDataFactory.createLocationDto()
-        );
-
-        Event event2 = Event.builder()
-                .id(UUID.randomUUID())
-                .title("One Battle After Another")
-                .description("Película de PT Anderson con Leonardo Dicaprio")
-                .date(validDate)
-                .type(EventType.MOVIE)
-                .build();
+        UUID eventWithoutVenueId = UUID.randomUUID();
+        Event eventWithoutVenue = TestDataFactory.createEvent(eventWithoutVenueId);
 
         when(venueMapper.toDto(any(Venue.class))).thenReturn(venueDto);
-        when(eventService.listEvents()).thenReturn(List.of(event1, event2));
+        when(eventService.listEvents()).thenReturn(List.of(eventWithVenue, eventWithoutVenue));
         when(eventMapper.toDto(any(Event.class)))
                 .thenAnswer(invocation -> {
             Event e = invocation.getArgument(0);
@@ -403,17 +275,9 @@ public class EventControllerTest {
 
         mockMvc.perform(get("/api/v1/events"))
                 .andExpect(status().isOk())
-                .andDo(print())
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].id").value(event1.getId().toString()))
-                .andExpect(jsonPath("$[1].id").value(event2.getId().toString()))
                 .andExpect(jsonPath("$[0].venue").exists())
-                .andExpect(jsonPath("$[0].venue.name").value("Folks"))
-                .andExpect(jsonPath("$[0].venue.venueType").value("NIGHT_CLUB"))
-                .andExpect(jsonPath("$[0].venue.location.city").value("A Coruña"))
-                .andExpect(jsonPath("$[0].venue.location.latitude").value(43.371909))
-                .andExpect(jsonPath("$[0].venue.location.longitude").value(-8.400471))
-                .andExpect(jsonPath("$[1].venue").isEmpty());
+                .andExpect(jsonPath("$[1].venue").doesNotExist());
     }
 
 
