@@ -1,11 +1,17 @@
 package com.boveda.quesefy.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.UUID;
 
 @Entity
 @Table(name = "venues")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Venue {
 
     @Id
@@ -23,26 +29,4 @@ public class Venue {
     @Embedded
     private Location location;
 
-    public UUID getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public VenueType getVenueType() {
-        return venueType;
-    }
-
-    public Location getLocation() {
-        return location;
-    }
-
-    public Venue(UUID id, String name, VenueType venueType, Location location) {
-        this.id = id;
-        this.name = name;
-        this.venueType = venueType;
-        this.location = location;
-    }
 }
