@@ -12,27 +12,28 @@ class EventTest {
 
     @Test
     void shouldAssignVenueToEvent() {
-        Event event = new Event(
-                UUID.randomUUID(),
-                "Concierto",
-                "Rock",
-                LocalDateTime.now().plusDays(1),
-                EventType.CONCERT,
-                EventStatus.DUE
-        );
+        Event event = Event.builder()
+                .id(UUID.randomUUID())
+                .title("title")
+                .description("Rock")
+                .date(LocalDateTime.now().plusDays(1))
+                .type(EventType.CONCERT)
+                .build();
 
-        Venue venue = new Venue(
-                UUID.randomUUID(),
-                "Sala Riviera",
-                VenueType.MUSIC_VENUE,
-                new Location("Av. Valladolid",
-                        "Madrid",
-                        "Spain",
-                        "28008",
-                        "Spain",
-                        40.4168,
-                        -3.7038)
-        );
+        Venue venue = Venue.builder()
+                .id(UUID.randomUUID())
+                .name("Sala Riviera")
+                .venueType(VenueType.MUSIC_VENUE)
+                .location(Location.builder()
+                        .address("Av. Valladolid")
+                        .city("Madrid")
+                        .province("Madrid")
+                        .zipcode("28008")
+                        .country("Spain")
+                        .latitude(40.4168)
+                        .longitude(-3.7038)
+                        .build())
+                .build();
 
         event.assignVenue(venue);
 
@@ -41,27 +42,28 @@ class EventTest {
 
     @Test
     void shouldRemoveVenueFromEvent() {
-        Event event = new Event(
-                UUID.randomUUID(),
-                "Concierto",
-                "Rock",
-                LocalDateTime.now().plusDays(1),
-                EventType.CONCERT,
-                EventStatus.DUE
-        );
+        Event event = Event.builder()
+                .id(UUID.randomUUID())
+                .title("title")
+                .description("Rock")
+                .date(LocalDateTime.now().plusDays(1))
+                .type(EventType.CONCERT)
+                .build();
 
-        Venue venue = new Venue(
-                UUID.randomUUID(),
-                "Sala Riviera",
-                VenueType.MUSIC_VENUE,
-                new Location("Av. Valladolid",
-                        "Madrid",
-                        "Spain",
-                        "28008",
-                        "Spain",
-                        40.4168,
-                        -3.7038)
-        );
+        Venue venue = Venue.builder()
+                .id(UUID.randomUUID())
+                .name("Sala Riviera")
+                .venueType(VenueType.MUSIC_VENUE)
+                .location(Location.builder()
+                        .address("Av. Valladolid")
+                        .city("Madrid")
+                        .province("Madrid")
+                        .zipcode("28008")
+                        .country("Spain")
+                        .latitude(40.4168)
+                        .longitude(-3.7038)
+                        .build())
+                .build();
 
         event.assignVenue(venue);
         event.removeVenue();
