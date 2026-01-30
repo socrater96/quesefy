@@ -1,13 +1,15 @@
 package com.boveda.quesefy.domain.dto;
 
-public record LocationDto(
-        String address,
-        String city,
-        String province,
-        String zipcode,
-        String country,
+import jakarta.validation.constraints.NotNull;
 
-        Double latitude,
-        Double longitude
+public record LocationDto(
+        @NotNull String address,
+        @NotNull String city,
+        @NotNull String province,
+        @NotNull String zipcode,
+        @NotNull String country,
+
+        @NotNull Double latitude,
+        @NotNull Double longitude
 ) {
 }
