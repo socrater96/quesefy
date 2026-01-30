@@ -13,7 +13,7 @@ public interface VenueService {
 
     Venue getById(UUID id);
 
-    List<Venue> getAll();
+    List<Venue> listVenues();
 
     Venue update(UUID id, UpdateVenueRequest request);
 
