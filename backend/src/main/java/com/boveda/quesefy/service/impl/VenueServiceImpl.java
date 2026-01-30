@@ -38,7 +38,7 @@ public class VenueServiceImpl implements VenueService {
     }
 
     @Override
-    public List<Venue> getAll() {
+    public List<Venue> listVenues() {
         return List.of();
     }
 

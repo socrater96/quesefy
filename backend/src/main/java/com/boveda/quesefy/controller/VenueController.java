@@ -9,10 +9,9 @@ import com.boveda.quesefy.service.VenueService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/v1/venues")
@@ -32,5 +31,16 @@ public class VenueController {
         VenueDto createdVenueDto = venueMapper.toDto(createdVenue);
 
         return new ResponseEntity<>(createdVenueDto, HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<VenueDto>> listVenue(){
+        List<Venue> venueList = venueService.listVenues();
+
+        List<VenueDto> venueDtoList = venueList.stream()
+                .map(venueMapper::toDto)
+                .toList();
+
+        return new ResponseEntity<>(venueDtoList, HttpStatus.OK);
     }
 }

@@ -13,11 +13,13 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
+import java.util.List;
 import java.util.UUID;
 
 import static com.boveda.quesefy.utils.TestDataFactory.VENUE_NAME;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -50,4 +52,28 @@ public class VenueControllerIntegrationTest {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").value(VENUE_NAME));
     }
+    @Test
+    void shouldReturnEmptyListWhenNoVenues() throws Exception {
+        when(venueService.listVenues()).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/v1/venues"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(0));
+    }
+
+    @Test
+    void shouldReturnListOfVenues() throws Exception {
+        Venue venue1 = TestDataFactory.createVenue(UUID.randomUUID());
+        Venue venue2 = TestDataFactory.createVenue(UUID.randomUUID());
+
+        when(venueService.listVenues()).thenReturn(List.of(venue1, venue2));
+
+        mockMvc.perform((get("/api/v1/venues")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(venue1.getId().toString()))
+                .andExpect(jsonPath("$[1].id").value(venue2.getId().toString()));
+    }
+
 }
