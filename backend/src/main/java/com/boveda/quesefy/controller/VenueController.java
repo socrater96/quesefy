@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/api/v1/venues")
@@ -34,7 +35,7 @@ public class VenueController {
     }
 
     @GetMapping
-    public ResponseEntity<List<VenueDto>> listVenue(){
+    public ResponseEntity<List<VenueDto>> listVenues(){
         List<Venue> venueList = venueService.listVenues();
 
         List<VenueDto> venueDtoList = venueList.stream()
@@ -43,4 +44,13 @@ public class VenueController {
 
         return new ResponseEntity<>(venueDtoList, HttpStatus.OK);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<VenueDto> getVenueById(@PathVariable UUID id) {
+        Venue venue = venueService.getById(id);
+        VenueDto venueDto = venueMapper.toDto(venue);
+
+        return ResponseEntity.ok(venueDto);
+    }
+
 }

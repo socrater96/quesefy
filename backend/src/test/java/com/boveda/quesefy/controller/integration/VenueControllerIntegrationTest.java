@@ -76,4 +76,16 @@ public class VenueControllerIntegrationTest {
                 .andExpect(jsonPath("$[1].id").value(venue2.getId().toString()));
     }
 
+    @Test
+    void shouldReturn200WhenVenueExist() throws Exception {
+        UUID venueId = UUID.randomUUID();
+        Venue venue = TestDataFactory.createVenue(venueId);
+
+        when(venueService.getById(venue.getId())).thenReturn(venue);
+
+        mockMvc.perform(get("/api/v1/venues/" + venue.getId().toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(venue.getId().toString()));
+    }
+
 }
