@@ -1,6 +1,7 @@
 package com.boveda.quesefy.controller.integration;
 
 import com.boveda.quesefy.domain.CreateVenueRequest;
+import com.boveda.quesefy.domain.UpdateVenueRequest;
 import com.boveda.quesefy.domain.entity.Venue;
 import com.boveda.quesefy.service.VenueService;
 import com.boveda.quesefy.utils.TestDataFactory;
@@ -18,9 +19,9 @@ import java.util.UUID;
 
 import static com.boveda.quesefy.utils.TestDataFactory.VENUE_NAME;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -88,4 +89,24 @@ public class VenueControllerIntegrationTest {
                 .andExpect(jsonPath("$.id").value(venue.getId().toString()));
     }
 
+    @Test
+    void shouldUpdateVenueAndReturn200() throws Exception {
+        UpdateVenueRequest domainRequest = TestDataFactory.createUpdateVenueRequest();
+
+        UUID venueId = UUID.randomUUID();
+        Venue venue = TestDataFactory.createVenue(venueId);
+        venue.setName(domainRequest.name());
+
+        when(venueService.update(
+                eq(venueId),
+                any(UpdateVenueRequest.class)
+        )).thenReturn(venue);
+
+        mockMvc.perform(put("/api/v1/venues/" + venue.getId().toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(domainRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(venue.getId().toString()))
+                .andExpect(jsonPath("$.name").value(venue.getName()));
+    }
 }

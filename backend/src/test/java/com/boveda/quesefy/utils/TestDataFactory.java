@@ -3,6 +3,7 @@ package com.boveda.quesefy.utils;
 import com.boveda.quesefy.domain.CreateEventRequest;
 import com.boveda.quesefy.domain.CreateVenueRequest;
 import com.boveda.quesefy.domain.UpdateEventRequest;
+import com.boveda.quesefy.domain.UpdateVenueRequest;
 import com.boveda.quesefy.domain.dto.EventDto;
 import com.boveda.quesefy.domain.dto.LocationDto;
 import com.boveda.quesefy.domain.dto.VenueDto;
@@ -155,4 +156,11 @@ public class TestDataFactory {
         );
     }
 
+    public static UpdateVenueRequest createUpdateVenueRequest() {
+        return new UpdateVenueRequest(
+                "Meliora",
+                VENUE_TYPE,
+                createLocation()
+        );
+    }
 }
