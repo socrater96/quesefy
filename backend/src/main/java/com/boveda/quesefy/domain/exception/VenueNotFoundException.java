@@ -9,7 +9,7 @@ public class VenueNotFoundException extends RuntimeException {
     private final UUID id;
 
     public VenueNotFoundException(UUID id) {
-        super("Event with id " + id + " not found");
+        super("Venue with id " + id + " not found");
         this.id = id;
 
     }
