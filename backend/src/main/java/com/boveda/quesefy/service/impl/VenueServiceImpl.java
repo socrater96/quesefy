@@ -4,6 +4,7 @@ import com.boveda.quesefy.domain.CreateVenueRequest;
 import com.boveda.quesefy.domain.UpdateVenueRequest;
 import com.boveda.quesefy.domain.entity.Venue;
 import com.boveda.quesefy.domain.exception.EventNotFoundException;
+import com.boveda.quesefy.domain.exception.VenueNotFoundException;
 import com.boveda.quesefy.repository.VenueRepository;
 import com.boveda.quesefy.service.VenueService;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,14 @@ public class VenueServiceImpl implements VenueService {
 
     @Override
     public Venue update(UUID id, UpdateVenueRequest request) {
-        return null;
+        Venue venue = venueRepository.findById(id)
+                .orElseThrow(() -> new VenueNotFoundException(id));
+
+        venue.setName(request.name());
+        venue.setVenueType(request.venueType());
+        venue.setLocation(request.location());
+
+        return venueRepository.save(venue);
     }
 
     @Override

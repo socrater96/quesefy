@@ -1,8 +1,8 @@
 package com.boveda.quesefy.controller;
 
 import com.boveda.quesefy.domain.CreateVenueRequest;
-import com.boveda.quesefy.domain.dto.CreateVenueRequestDto;
-import com.boveda.quesefy.domain.dto.VenueDto;
+import com.boveda.quesefy.domain.UpdateVenueRequest;
+import com.boveda.quesefy.domain.dto.*;
 import com.boveda.quesefy.domain.entity.Venue;
 import com.boveda.quesefy.mapper.VenueMapper;
 import com.boveda.quesefy.service.VenueService;
@@ -51,6 +51,18 @@ public class VenueController {
         VenueDto venueDto = venueMapper.toDto(venue);
 
         return ResponseEntity.ok(venueDto);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<VenueDto> updateVenue(
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateVenueRequestDto updateVenueRequestDto
+    ) {
+        UpdateVenueRequest updateVenueRequest = venueMapper.fromDto(updateVenueRequestDto);
+        Venue venue = venueService.update(id, updateVenueRequest);
+        VenueDto updatedVenueDto = venueMapper.toDto(venue);
+
+        return ResponseEntity.ok(updatedVenueDto);
     }
 
 }
