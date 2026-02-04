@@ -2,6 +2,7 @@ package com.boveda.quesefy.controller;
 
 import com.boveda.quesefy.domain.dto.ErrorDto;
 import com.boveda.quesefy.domain.exception.EventNotFoundException;
+import com.boveda.quesefy.domain.exception.VenueNotFoundException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(EventNotFoundException.class)
     public  ResponseEntity<ErrorDto>  handleEventNotFound(EventNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorDto(ex.getMessage()));
+    }
+
+    @ExceptionHandler(VenueNotFoundException.class)
+    public  ResponseEntity<ErrorDto>  handleVenueNotFound(VenueNotFoundException ex) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(new ErrorDto(ex.getMessage()));
