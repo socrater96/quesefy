@@ -12,11 +12,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class EventMapperImpl implements EventMapper {
-    private final VenueMapper venueMapper;
-
-    public EventMapperImpl(VenueMapper venueMapper) {
-        this.venueMapper = venueMapper;
-    }
+//    private final VenueMapper venueMapper;
+//
+//    public EventMapperImpl(VenueMapper venueMapper) {
+//        this.venueMapper = venueMapper;
+//    }
 
     @Override
     public CreateEventRequest fromDto(CreateEventRequestDto requestDto) {
@@ -24,7 +24,8 @@ public class EventMapperImpl implements EventMapper {
                 requestDto.title(),
                 requestDto.description(),
                 requestDto.date(),
-                requestDto.type()
+                requestDto.type(),
+                requestDto.venueId()
         );
     }
 
@@ -49,7 +50,7 @@ public class EventMapperImpl implements EventMapper {
                 event.getType(),
                 event.getStatus(),
                 event.getVenue() != null
-                        ? venueMapper.toDto(event.getVenue())
+                        ? event.getVenue().getId()
                         : null
         );
     }

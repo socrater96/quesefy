@@ -47,7 +47,7 @@ public record EventDto(
         @Schema(
                 description = "Venue where the event is held"
         )
-        VenueDto venue
+        UUID venueId
 ) {
 
 
