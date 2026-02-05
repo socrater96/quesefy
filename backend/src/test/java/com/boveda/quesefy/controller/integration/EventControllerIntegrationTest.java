@@ -114,7 +114,7 @@ public class EventControllerIntegrationTest {
         mockMvc.perform(get("/api/v1/events"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].venue").exists())
-                .andExpect(jsonPath("$[1].venue").doesNotExist());
+                .andExpect(jsonPath("$[0].venueId").exists())
+                .andExpect(jsonPath("$[1].venueId").doesNotExist());
     }
 }
