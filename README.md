@@ -1,6 +1,6 @@
-# Quesfy
+# Quesefy
 
-Quesfy is an event management platform with a Spring Boot backend and
+Quesefy is an event management platform with a Spring Boot backend and
 future Web and Android clients.
 
 This repository currently contains the backend REST API, which focuses on
@@ -25,7 +25,8 @@ clean architecture, proper error handling and automated testing.
 - Spring Web
 - Spring Data JPA
 - Hibernate
-- H2 (in-memory database)
+- Swagger-OpenAPI
+- H2 (in-memory database) -> Eventually will migrate to PostgreSQL
 - Maven
 - JUnit 5 & Mockito
 
