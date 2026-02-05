@@ -3,8 +3,11 @@ package com.boveda.quesefy.service.impl;
 import com.boveda.quesefy.domain.CreateEventRequest;
 import com.boveda.quesefy.domain.UpdateEventRequest;
 import com.boveda.quesefy.domain.entity.Event;
+import com.boveda.quesefy.domain.entity.Venue;
 import com.boveda.quesefy.domain.exception.EventNotFoundException;
+import com.boveda.quesefy.domain.exception.VenueNotFoundException;
 import com.boveda.quesefy.repository.EventRepository;
+import com.boveda.quesefy.repository.VenueRepository;
 import com.boveda.quesefy.service.EventService;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -16,9 +19,14 @@ import java.util.UUID;
 public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
+    private final VenueRepository venueRepository;
 
-    public EventServiceImpl(EventRepository eventRepository) {
+    public EventServiceImpl(
+            EventRepository eventRepository,
+            VenueRepository venueRepository
+    ) {
         this.eventRepository = eventRepository;
+        this.venueRepository = venueRepository;
     }
 
     @Override
@@ -30,6 +38,12 @@ public class EventServiceImpl implements EventService {
                 .date(request.date())
                 .type(request.type())
                 .build();
+
+        if (request.venueId() != null) {
+            Venue venue = venueRepository.findById(request.venueId())
+                    .orElseThrow(() -> new VenueNotFoundException(request.venueId()));
+            event.assignVenue(venue);
+        }
 
         return eventRepository.save(event);
     }

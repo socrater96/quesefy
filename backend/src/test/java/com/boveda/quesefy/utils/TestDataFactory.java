@@ -38,7 +38,8 @@ public class TestDataFactory {
                 EVENT_TITLE,
                 EVENT_DESCRIPTION,
                 VALID_DATE,
-                EVENT_TYPE
+                EVENT_TYPE,
+                null
         );
 
     }
@@ -123,7 +124,7 @@ public class TestDataFactory {
 
     }
 
-    public static EventDto createEventDtoWithVenue(UUID eventId, VenueDto venue) {
+    public static EventDto createEventDtoWithVenue(UUID eventId, UUID venueId) {
         return new EventDto(
                 eventId,
                 EVENT_TITLE,
@@ -131,7 +132,7 @@ public class TestDataFactory {
                 VALID_DATE,
                 EVENT_TYPE,
                 EventStatus.DUE,
-                venue
+                venueId
         );
     }
 
