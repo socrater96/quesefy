@@ -32,7 +32,6 @@ public class EventServiceImpl implements EventService {
     @Override
     public Event createEvent(CreateEventRequest request) {
         Event event = Event.builder()
-                .id(UUID.randomUUID())
                 .title(request.title())
                 .description(request.description())
                 .date(request.date())
@@ -64,11 +63,26 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findById(eventId)
                         .orElseThrow(() -> new EventNotFoundException(eventId));
 
-        event.setTitle(request.title());
-        event.setDescription(request.description());
-        event.setDate(request.date());
-        event.setType(request.type());
-        event.setStatus(request.status());
+        if (request.title() != null) {
+            event.setTitle(request.title());
+        }
+        if (request.description() != null) {
+            event.setDescription(request.description());
+        }
+        if (request.date() != null) {
+            event.setDate(request.date());
+        }
+        if (request.type() != null) {
+            event.setType(request.type());
+        }
+        if (request.status() != null) {
+            event.setStatus(request.status());
+        }
+        if (request.venueId() != null) {
+            Venue venue = venueRepository.findById(request.venueId())
+                    .orElseThrow(() -> new VenueNotFoundException(request.venueId()));
+            event.assignVenue(venue);
+        }
 
         return eventRepository.save(event);
     }
