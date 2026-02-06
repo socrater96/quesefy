@@ -30,7 +30,8 @@ public class EventMapperImpl implements EventMapper {
                 requestDto.description(),
                 requestDto.date(),
                 requestDto.type(),
-                requestDto.status()
+                requestDto.status(),
+                requestDto.venueId()
         );
     }
 
