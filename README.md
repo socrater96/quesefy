@@ -1,32 +1,41 @@
 # Quesefy
 
-Quesefy is an event management platform with a Spring Boot backend and
-future Web and Android clients.
+Quesefy is an event management platform developed with a backend-first approach,
+powered by Spring Boot, with planned Web and Android clients.
 
 This repository currently contains the backend REST API, which focuses on
-clean architecture, proper error handling and automated testing.
+clean architecture, proper error handling, and automated testing.
 
 ## Project Structure
-- backend: REST API built with Spring Boot
+- backend: Spring Boot REST API (active development)
 - android: Android client (planned)
 - web: Web client (planned)
 
 ## Backend Features
-- Create events
-- Update existing events
+
+### Core Functionality
+- Create and manage venues
+- Create and manage events associated with venues
 - Retrieve events by ID
-- Input validation with meaningful HTTP responses
+- Update existing events and venues (supports partial updates)
+- Assign and update event venues
+
+### API & Validation
+- Input validation using Bean Validation (`@Valid`)
+- Meaningful HTTP responses for validation and business errors
 - Centralized exception handling
 
 ## Tech Stack
+
 ### Backend
 - Java
 - Spring Boot
 - Spring Web
 - Spring Data JPA
-- Hibernate
-- Swagger-OpenAPI
-- H2 (in-memory database) -> Eventually will migrate to PostgreSQL
+- Hibernate (JPA implementation)
+- Swagger / OpenAPI
+- H2 (in-memory database for development)
+- PostgreSQL (planned)
 - Maven
 - JUnit 5 & Mockito
 
@@ -35,12 +44,14 @@ clean architecture, proper error handling and automated testing.
 - Web (TBD)
 
 ## Architecture
-The backend follows a layered architecture:
-- Controller layer for HTTP handling
-- Service layer for business logic
-- DTOs and mappers for API/domain separation
-- Global exception handling using `@RestControllerAdvice`
+The backend follows a layered architecture with clear separation of concerns:
 
+- Controller layer for HTTP request/response handling
+- Service layer for business logic
+- DTOs and mappers to separate API models from domain models
+- Repository layer using Spring Data JPA
+- Global exception handling using `@RestControllerAdvice`
+  
 ## Running the backend
 bash
 ./mvnw spring-boot:run
@@ -50,4 +61,5 @@ bash
 
 ## Project Status
 
-The project is in an early stage and actively evolving.
+The project is in an early stage and actively evolving, with a focus on
+building a solid backend foundation before expanding to client applications.
