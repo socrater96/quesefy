@@ -29,4 +29,29 @@ public class Venue {
     @Embedded
     private Location location;
 
+    public void updateLocation(Location newLocation) {
+        if (newLocation.getAddress() != null) {
+            this.location.setAddress(newLocation.getAddress());
+        }
+        if (newLocation.getCity() != null) {
+            this.location.setCity(newLocation.getCity());
+        }
+        if (newLocation.getProvince() != null) {
+            this.location.setProvince(newLocation.getProvince());
+        }
+        if (newLocation.getZipcode() != null) {
+            this.location.setZipcode(newLocation.getZipcode());
+        }
+        if (newLocation.getCountry() != null) {
+            this.location.setCountry(newLocation.getCountry());
+        }
+
+        if (newLocation.getLatitude() != null) {
+            this.location.setLatitude(newLocation.getLatitude());
+        }
+        if (newLocation.getLongitude() != null) {
+            this.location.setLongitude(newLocation.getLongitude());
+        }
+    }
+
 }

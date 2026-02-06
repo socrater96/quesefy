@@ -109,7 +109,7 @@ public class EventControllerIntegrationTest {
 
     @Test
     void shouldUpdateEventPartially() throws Exception {
-        String updatedDescription = "Updated Description";
+        String updatedDescription = "Updated description";
         UUID venueId = UUID.randomUUID();
         UpdateEventRequestDto updateEventRequestDto = new UpdateEventRequestDto(
                 null,

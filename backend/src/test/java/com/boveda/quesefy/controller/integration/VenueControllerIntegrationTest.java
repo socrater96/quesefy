@@ -2,10 +2,13 @@ package com.boveda.quesefy.controller.integration;
 
 import com.boveda.quesefy.domain.CreateVenueRequest;
 import com.boveda.quesefy.domain.UpdateVenueRequest;
+import com.boveda.quesefy.domain.dto.LocationDto;
+import com.boveda.quesefy.domain.dto.UpdateVenueRequestDto;
 import com.boveda.quesefy.domain.entity.Venue;
 import com.boveda.quesefy.service.VenueService;
 import com.boveda.quesefy.utils.TestDataFactory;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -18,8 +21,10 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.boveda.quesefy.utils.TestDataFactory.VENUE_NAME;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -108,5 +113,58 @@ public class VenueControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(venue.getId().toString()))
                 .andExpect(jsonPath("$.name").value(venue.getName()));
+    }
+
+    @Test
+    void shouldUpdateVenuePartially() throws Exception {
+        LocationDto updatedLocation = new LocationDto(
+                null,
+                "Madrid",
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        UpdateVenueRequestDto updateVenueRequestDto = new UpdateVenueRequestDto(
+                null,
+                null,
+                updatedLocation
+        );
+
+        UUID venueId = UUID.randomUUID();
+        Venue updatedVenue = TestDataFactory.createVenue(venueId);
+        updatedVenue.getLocation().setCity("Madrid");
+
+        when(venueService.update(eq(venueId), any(UpdateVenueRequest.class)))
+                .thenReturn(updatedVenue);
+
+        mockMvc.perform(put("/api/v1/venues/" + venueId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateVenueRequestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(venueId.toString()))
+                .andExpect(jsonPath("$.location.city").value("Madrid"));
+
+        ArgumentCaptor<UpdateVenueRequest> captor =
+                ArgumentCaptor.forClass(UpdateVenueRequest.class);
+
+        verify(venueService).update(eq(venueId), captor.capture());
+
+        UpdateVenueRequest sent = captor.getValue();
+
+        assertNull(sent.name());
+        assertNull(sent.venueType());
+
+        assertNotNull(sent.location());
+        assertEquals("Madrid", sent.location().getCity());
+
+        assertNull(sent.location().getAddress());
+        assertNull(sent.location().getProvince());
+        assertNull(sent.location().getZipcode());
+        assertNull(sent.location().getCountry());
+        assertNull(sent.location().getLatitude());
+        assertNull(sent.location().getLongitude());
     }
 }
