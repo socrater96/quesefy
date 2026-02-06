@@ -2,6 +2,7 @@ package com.boveda.quesefy.controller.integration;
 
 import com.boveda.quesefy.domain.CreateEventRequest;
 import com.boveda.quesefy.domain.UpdateEventRequest;
+import com.boveda.quesefy.domain.dto.UpdateEventRequestDto;
 import com.boveda.quesefy.domain.entity.Event;
 import com.boveda.quesefy.domain.entity.Venue;
 import com.boveda.quesefy.service.EventService;
@@ -13,13 +14,18 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.mockito.ArgumentCaptor;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.UUID;
 
 import static com.boveda.quesefy.utils.TestDataFactory.EVENT_TITLE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -81,21 +87,65 @@ public class EventControllerIntegrationTest {
     }
 
     @Test
-    void shouldUpdateEventAndReturn200() throws Exception {
-        UpdateEventRequest updateEventRequest = TestDataFactory.createUpdateEventRequest();
+    void shouldUpdateOnlyTitleAndReturn200() throws Exception {
+        UUID eventId = UUID.randomUUID();
+        UpdateEventRequest request = new UpdateEventRequest(
+                "New Title", null, null, null, null, null
+        );
+
+        Event updatedEvent = TestDataFactory.createEvent(eventId);
+        updatedEvent.setTitle("New Title");
+
+        when(eventService.updateEvent(eventId, request)).thenReturn(updatedEvent);
+
+        mockMvc.perform(put("/api/v1/events/" + eventId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("New Title"));
+
+        verify(eventService).updateEvent(eventId, request);
+    }
+
+    @Test
+    void shouldUpdateEventPartially() throws Exception {
+        String updatedDescription = "Updated Description";
+        UUID venueId = UUID.randomUUID();
+        UpdateEventRequestDto updateEventRequestDto = new UpdateEventRequestDto(
+                null,
+                updatedDescription,
+                null,
+                null,
+                null,
+                venueId
+        );
 
         UUID eventId = UUID.randomUUID();
-        Event event = TestDataFactory.createEvent(eventId);
+        Event updatedEvent = TestDataFactory.createEvent(eventId);
+        updatedEvent.setDescription(updatedDescription);
+        updatedEvent.assignVenue(TestDataFactory.createVenue(venueId));
 
-        when(eventService.updateEvent(event.getId(), updateEventRequest)).thenReturn(event);
+        when(eventService.updateEvent(eq(eventId), any(UpdateEventRequest.class)))
+                .thenReturn(updatedEvent);
 
-        mockMvc.perform(put("/api/v1/events/" + event.getId().toString())
+        mockMvc.perform(put("/api/v1/events/" + eventId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateEventRequest)))
+                        .content(objectMapper.writeValueAsString(updateEventRequestDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(event.getId().toString()))
-                .andExpect(jsonPath("$.status").value(event.getStatus().toString()));
+                .andExpect(jsonPath("$.title").value(EVENT_TITLE))
+                .andExpect(jsonPath("$.description").value(updatedDescription))
+                .andExpect(jsonPath("$.venueId").value(venueId.toString()));
 
+        ArgumentCaptor<UpdateEventRequest> captor = ArgumentCaptor.forClass(UpdateEventRequest.class);
+        verify(eventService).updateEvent(eq(eventId), captor.capture());
+
+        UpdateEventRequest sent = captor.getValue();
+        assertNull(sent.title());
+        assertEquals("Updated description", sent.description());
+        assertNull(sent.date());
+        assertNull(sent.type());
+        assertNull(sent.status());
+        assertEquals(venueId, sent.venueId());
     }
 
     @Test

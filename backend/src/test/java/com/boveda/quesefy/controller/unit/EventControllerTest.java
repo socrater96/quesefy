@@ -134,7 +134,7 @@ public class EventControllerTest {
     void shouldNotUpdateEventAndReturn404WhenEventDoesNotExist() throws Exception {
         UUID nonExistingId = UUID.randomUUID();
 
-        UpdateEventRequest updateEventRequest = TestDataFactory.createUpdateEventRequest();
+        UpdateEventRequest updateEventRequest = TestDataFactory.createUpdateEventRequest(null);
 
         when(eventMapper.fromDto(any(UpdateEventRequestDto.class)))
                 .thenReturn(updateEventRequest);
