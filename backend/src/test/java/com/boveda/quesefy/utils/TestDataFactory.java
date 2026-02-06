@@ -44,13 +44,14 @@ public class TestDataFactory {
 
     }
 
-    public static UpdateEventRequest createUpdateEventRequest() {
+    public static UpdateEventRequest createUpdateEventRequest(UUID venueId) {
         return new UpdateEventRequest(
                 EVENT_TITLE,
                 EVENT_DESCRIPTION,
                 VALID_DATE,
                 EVENT_TYPE,
-                EventStatus.COMPLETED
+                EventStatus.COMPLETED,
+                venueId
         );
 
     }
