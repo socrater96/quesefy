@@ -7,6 +7,7 @@ import com.boveda.quesefy.domain.exception.EventNotFoundException;
 import com.boveda.quesefy.domain.exception.VenueNotFoundException;
 import com.boveda.quesefy.repository.VenueRepository;
 import com.boveda.quesefy.service.VenueService;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,7 +39,7 @@ public class VenueServiceImpl implements VenueService {
 
     @Override
     public List<Venue> listVenues() {
-        return List.of();
+        return venueRepository.findAll(Sort.by(Sort.Direction.ASC, "name"));
     }
 
     @Override
