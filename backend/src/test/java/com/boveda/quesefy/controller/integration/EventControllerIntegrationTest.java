@@ -167,4 +167,14 @@ public class EventControllerIntegrationTest {
                 .andExpect(jsonPath("$[0].venueId").exists())
                 .andExpect(jsonPath("$[1].venueId").doesNotExist());
     }
+
+    @Test
+    void shouldDeleteEventAndReturn204() throws Exception {
+        UUID eventId = UUID.randomUUID();
+
+        Event event = TestDataFactory.createEvent(eventId);
+
+        mockMvc.perform(delete("/api/v1/events/" + event.getId().toString()))
+                .andExpect(status().isNoContent());
+    }
 }
