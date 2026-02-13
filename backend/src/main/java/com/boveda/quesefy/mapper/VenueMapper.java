@@ -9,13 +9,10 @@ import com.boveda.quesefy.domain.dto.UpdateVenueRequestDto;
 import com.boveda.quesefy.domain.dto.VenueDto;
 import com.boveda.quesefy.domain.entity.Location;
 import com.boveda.quesefy.domain.entity.Venue;
+import com.boveda.quesefy.mapper.config.CentralMapperConfig;
 import org.mapstruct.Mapper;
-import org.mapstruct.ReportingPolicy;
 
-@Mapper(
-        componentModel = "spring",
-        unmappedTargetPolicy = ReportingPolicy.IGNORE
-)
+@Mapper(config = CentralMapperConfig.class)
 public interface VenueMapper {
 
     CreateVenueRequest fromDto(CreateVenueRequestDto dto);
