@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/quesefy_schema_gen
+    username: quesefy
+    password: quesefy
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: false
+
+  flyway:
+    enabled: false
