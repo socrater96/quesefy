@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -54,6 +55,7 @@ public class VenueControllerIntegrationTest {
                 .thenReturn(venue);
 
         mockMvc.perform((post("/api/v1/venues"))
+                        .with(httpBasic("admin", "admin123"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(domainRequest)))
                 .andExpect(status().isCreated())
@@ -64,7 +66,8 @@ public class VenueControllerIntegrationTest {
     void shouldReturnEmptyListWhenNoVenues() throws Exception {
         when(venueService.listVenues()).thenReturn(List.of());
 
-        mockMvc.perform(get("/api/v1/venues"))
+        mockMvc.perform(get("/api/v1/venues")
+                        .with(httpBasic("user", "user123")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(0));
@@ -77,7 +80,8 @@ public class VenueControllerIntegrationTest {
 
         when(venueService.listVenues()).thenReturn(List.of(venue1, venue2));
 
-        mockMvc.perform((get("/api/v1/venues")))
+        mockMvc.perform((get("/api/v1/venues"))
+                        .with(httpBasic("user", "user123")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].id").value(venue1.getId().toString()))
@@ -91,7 +95,8 @@ public class VenueControllerIntegrationTest {
 
         when(venueService.getById(venue.getId())).thenReturn(venue);
 
-        mockMvc.perform(get("/api/v1/venues/" + venue.getId().toString()))
+        mockMvc.perform(get("/api/v1/venues/" + venue.getId().toString())
+                        .with(httpBasic("user", "user123")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(venue.getId().toString()));
     }
@@ -110,6 +115,7 @@ public class VenueControllerIntegrationTest {
         )).thenReturn(venue);
 
         mockMvc.perform(put("/api/v1/venues/" + venue.getId().toString())
+                        .with(httpBasic("admin", "admin123"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(domainRequest)))
                 .andExpect(status().isOk())
@@ -143,6 +149,7 @@ public class VenueControllerIntegrationTest {
                 .thenReturn(updatedVenue);
 
         mockMvc.perform(put("/api/v1/venues/" + venueId)
+                        .with(httpBasic("admin", "admin123"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateVenueRequestDto)))
                 .andExpect(status().isOk())

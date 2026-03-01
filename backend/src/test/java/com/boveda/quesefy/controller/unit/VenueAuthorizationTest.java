@@ -1,0 +1,116 @@
+package com.boveda.quesefy.controller.unit;
+
+import com.boveda.quesefy.config.SecurityConfig;
+import com.boveda.quesefy.controller.VenueController;
+import com.boveda.quesefy.domain.CreateVenueRequest;
+import com.boveda.quesefy.domain.dto.CreateVenueRequestDto;
+import com.boveda.quesefy.domain.entity.Venue;
+import com.boveda.quesefy.mapper.VenueMapper;
+import com.boveda.quesefy.service.VenueService;
+import com.boveda.quesefy.utils.TestDataFactory;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration;
+import org.springframework.boot.security.autoconfigure.web.servlet.SecurityFilterAutoConfiguration;
+import org.springframework.boot.security.autoconfigure.web.servlet.ServletWebSecurityAutoConfiguration;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
+
+import java.util.List;
+import java.util.UUID;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest(VenueController.class)
+@Import(SecurityConfig.class)
+@ImportAutoConfiguration({
+        SecurityAutoConfiguration.class,
+        SecurityFilterAutoConfiguration.class,
+        ServletWebSecurityAutoConfiguration.class
+})
+@TestPropertySource(properties = {
+        "quesefy.security.admin.username=admin",
+        "quesefy.security.admin.password=admin123",
+        "quesefy.security.user.username=user",
+        "quesefy.security.user.password=user123"
+})
+public class VenueAuthorizationTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockitoBean
+    private VenueService venueService;
+
+    @MockitoBean
+    private VenueMapper venueMapper;
+
+    @Test
+    void shouldReturn401WhenAnonymousUserListsVenues() throws Exception {
+        mockMvc.perform(get("/api/v1/venues"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error").value("Authentication required"));
+    }
+
+    @Test
+    void shouldAllowUserToListVenues() throws Exception {
+        when(venueService.listVenues()).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/v1/venues")
+                        .with(httpBasic("user", "user123")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
+    }
+
+    @Test
+    void shouldReturn403WhenUserCreatesVenue() throws Exception {
+        mockMvc.perform(post("/api/v1/venues")
+                        .with(httpBasic("user", "user123"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createCreateVenueRequestDto())))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error").value("Access denied"));
+    }
+
+    @Test
+    void shouldAllowAdminToCreateVenue() throws Exception {
+        UUID venueId = UUID.randomUUID();
+        CreateVenueRequest createVenueRequest = TestDataFactory.createCreateVenueRequest();
+        Venue venue = TestDataFactory.createVenue(venueId);
+
+        when(venueMapper.fromDto(any(CreateVenueRequestDto.class))).thenReturn(createVenueRequest);
+        when(venueService.createVenue(createVenueRequest)).thenReturn(venue);
+        when(venueMapper.toDto(venue)).thenReturn(TestDataFactory.createVenueDto(venueId));
+
+        mockMvc.perform(post("/api/v1/venues")
+                        .with(httpBasic("admin", "admin123"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createCreateVenueRequestDto())))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(venueId.toString()))
+                .andExpect(jsonPath("$.name").value(TestDataFactory.VENUE_NAME));
+    }
+
+    private CreateVenueRequestDto createCreateVenueRequestDto() {
+        return new CreateVenueRequestDto(
+                TestDataFactory.VENUE_NAME,
+                TestDataFactory.VENUE_TYPE,
+                TestDataFactory.createLocationDto()
+        );
+    }
+}

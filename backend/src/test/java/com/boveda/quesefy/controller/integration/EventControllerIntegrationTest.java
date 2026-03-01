@@ -28,6 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -55,6 +56,7 @@ public class EventControllerIntegrationTest {
                     .thenReturn(event);
 
         mockMvc.perform(post("/api/v1/events")
+                        .with(httpBasic("admin", "admin123"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -69,7 +71,8 @@ public class EventControllerIntegrationTest {
 
         when(eventService.listEvents()).thenReturn(List.of(event1, event2));
 
-        mockMvc.perform(get("/api/v1/events"))
+        mockMvc.perform(get("/api/v1/events")
+                        .with(httpBasic("user", "user123")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].id").value(event1.getId().toString()))
@@ -83,7 +86,8 @@ public class EventControllerIntegrationTest {
 
         when(eventService.getEventById(event.getId())).thenReturn(event);
 
-        mockMvc.perform(get("/api/v1/events/" + event.getId().toString()))
+        mockMvc.perform(get("/api/v1/events/" + event.getId().toString())
+                        .with(httpBasic("user", "user123")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(event.getId().toString()));
     }
@@ -101,6 +105,7 @@ public class EventControllerIntegrationTest {
         when(eventService.updateEvent(eventId, request)).thenReturn(updatedEvent);
 
         mockMvc.perform(put("/api/v1/events/" + eventId)
+                        .with(httpBasic("admin", "admin123"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -131,6 +136,7 @@ public class EventControllerIntegrationTest {
                 .thenReturn(updatedEvent);
 
         mockMvc.perform(put("/api/v1/events/" + eventId)
+                        .with(httpBasic("admin", "admin123"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateEventRequestDto)))
                 .andExpect(status().isOk())
@@ -163,7 +169,8 @@ public class EventControllerIntegrationTest {
 
         when(eventService.listEvents()).thenReturn(List.of(eventWithVenue, eventWithoutVenue));
 
-        mockMvc.perform(get("/api/v1/events"))
+        mockMvc.perform(get("/api/v1/events")
+                        .with(httpBasic("user", "user123")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].venueId").exists())
@@ -176,7 +183,8 @@ public class EventControllerIntegrationTest {
 
         Event event = TestDataFactory.createEvent(eventId);
 
-        mockMvc.perform(delete("/api/v1/events/" + event.getId().toString()))
+        mockMvc.perform(delete("/api/v1/events/" + event.getId().toString())
+                        .with(httpBasic("admin", "admin123")))
                 .andExpect(status().isNoContent());
     }
 }
