@@ -1,3 +1,12 @@
 spring:
   application:
     name: quesefy
+
+quesefy:
+  security:
+    admin:
+      username: ${QUESEFY_ADMIN_USERNAME:admin}
+      password: ${QUESEFY_ADMIN_PASSWORD:admin123}
+    user:
+      username: ${QUESEFY_USER_USERNAME:user}
+      password: ${QUESEFY_USER_PASSWORD:user123}

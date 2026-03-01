@@ -10,6 +10,7 @@ import com.boveda.quesefy.service.EventService;
 import com.boveda.quesefy.utils.TestDataFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -31,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @WebMvcTest(EventController.class)
+@AutoConfigureMockMvc(addFilters = false)
 public class EventControllerTest {
 
     @Autowired
