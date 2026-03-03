@@ -63,10 +63,12 @@ public class EventAuthorizationTest {
     private EventMapper eventMapper;
 
     @Test
-    void shouldReturn401WhenAnonymousUserListsEvents() throws Exception {
+    void shouldAllowAnonymousUserToListEvents() throws Exception {
+        when(eventService.listEvents()).thenReturn(List.of());
+
         mockMvc.perform(get("/api/v1/events"))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.error").value("Authentication required"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
     }
 
     @Test

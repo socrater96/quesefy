@@ -61,10 +61,12 @@ public class VenueAuthorizationTest {
     private VenueMapper venueMapper;
 
     @Test
-    void shouldReturn401WhenAnonymousUserListsVenues() throws Exception {
+    void shouldAllowAnonymousUserToListVenues() throws Exception {
+        when(venueService.listVenues()).thenReturn(List.of());
+
         mockMvc.perform(get("/api/v1/venues"))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.error").value("Authentication required"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
     }
 
     @Test

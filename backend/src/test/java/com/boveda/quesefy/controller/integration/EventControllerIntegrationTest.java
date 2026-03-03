@@ -71,8 +71,7 @@ public class EventControllerIntegrationTest {
 
         when(eventService.listEvents()).thenReturn(List.of(event1, event2));
 
-        mockMvc.perform(get("/api/v1/events")
-                        .with(httpBasic("user", "user123")))
+        mockMvc.perform(get("/api/v1/events"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].id").value(event1.getId().toString()))
@@ -86,8 +85,7 @@ public class EventControllerIntegrationTest {
 
         when(eventService.getEventById(event.getId())).thenReturn(event);
 
-        mockMvc.perform(get("/api/v1/events/" + event.getId().toString())
-                        .with(httpBasic("user", "user123")))
+        mockMvc.perform(get("/api/v1/events/" + event.getId().toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(event.getId().toString()));
     }
@@ -169,8 +167,7 @@ public class EventControllerIntegrationTest {
 
         when(eventService.listEvents()).thenReturn(List.of(eventWithVenue, eventWithoutVenue));
 
-        mockMvc.perform(get("/api/v1/events")
-                        .with(httpBasic("user", "user123")))
+        mockMvc.perform(get("/api/v1/events"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].venueId").exists())

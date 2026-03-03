@@ -66,8 +66,7 @@ public class VenueControllerIntegrationTest {
     void shouldReturnEmptyListWhenNoVenues() throws Exception {
         when(venueService.listVenues()).thenReturn(List.of());
 
-        mockMvc.perform(get("/api/v1/venues")
-                        .with(httpBasic("user", "user123")))
+        mockMvc.perform(get("/api/v1/venues"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(0));
@@ -80,8 +79,7 @@ public class VenueControllerIntegrationTest {
 
         when(venueService.listVenues()).thenReturn(List.of(venue1, venue2));
 
-        mockMvc.perform((get("/api/v1/venues"))
-                        .with(httpBasic("user", "user123")))
+        mockMvc.perform((get("/api/v1/venues")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].id").value(venue1.getId().toString()))
@@ -95,8 +93,7 @@ public class VenueControllerIntegrationTest {
 
         when(venueService.getById(venue.getId())).thenReturn(venue);
 
-        mockMvc.perform(get("/api/v1/venues/" + venue.getId().toString())
-                        .with(httpBasic("user", "user123")))
+        mockMvc.perform(get("/api/v1/venues/" + venue.getId().toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(venue.getId().toString()));
     }

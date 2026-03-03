@@ -23,7 +23,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/api/v1/venues")
-@SecurityRequirement(name = "basicAuth")
 public class VenueController {
     private final VenueService venueService;
     private final VenueMapper venueMapper;
@@ -52,6 +51,7 @@ public class VenueController {
             )
     })
     @PostMapping
+    @SecurityRequirement(name = "basicAuth")
     public ResponseEntity<VenueDto> createVenue(@Valid @RequestBody CreateVenueRequestDto createVenueRequestDto){
         CreateVenueRequest createVenueRequest = venueMapper.fromDto(createVenueRequestDto);
         Venue createdVenue = venueService.createVenue(createVenueRequest);
@@ -122,6 +122,7 @@ public class VenueController {
             @ApiResponse(responseCode = "404", description = "Venue not found")
     })
     @PutMapping("/{id}")
+    @SecurityRequirement(name = "basicAuth")
     public ResponseEntity<VenueDto> updateVenue(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateVenueRequestDto updateVenueRequestDto

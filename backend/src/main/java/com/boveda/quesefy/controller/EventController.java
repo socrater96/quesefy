@@ -25,7 +25,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/api/v1/events")
-@SecurityRequirement(name = "basicAuth")
 public class EventController {
     private final EventService eventService;
     private final EventMapper eventMapper;
@@ -55,6 +54,7 @@ public class EventController {
             )
     })
     @PostMapping
+    @SecurityRequirement(name = "basicAuth")
     public ResponseEntity<EventDto> createEvent(@Valid @RequestBody CreateEventRequestDto createEventRequestDto) {
         CreateEventRequest createEventRequest = eventMapper.fromDto(createEventRequestDto);
         Event event = eventService.createEvent(createEventRequest);
@@ -137,6 +137,7 @@ public class EventController {
             )
     })
     @PutMapping("/{id}")
+    @SecurityRequirement(name = "basicAuth")
     public ResponseEntity<EventDto> updateEvent(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateEventRequestDto updateEventRequestDto
@@ -149,6 +150,7 @@ public class EventController {
     }
 
     @DeleteMapping("/{id}")
+    @SecurityRequirement(name = "basicAuth")
     public ResponseEntity<Void> deleteEvent(@PathVariable UUID id) {
         eventService.delete(id);
 
